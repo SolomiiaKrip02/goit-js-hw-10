@@ -26,6 +26,12 @@
 .input-delay:-moz-suppressed {
   border: 1px solid #4e75ff;
 }
+
+.fieldset {
+  width: 360px;
+  height: 78px;
+}
+
 .state {
   font-family: var(--font-family);
   font-weight: 400;
