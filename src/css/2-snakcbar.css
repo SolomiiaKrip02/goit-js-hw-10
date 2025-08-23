@@ -30,6 +30,7 @@
 .fieldset {
   width: 360px;
   height: 78px;
+  margin-bottom: 24px;
 }
 
 .state {
@@ -51,7 +52,6 @@
   border-radius: 4px;
   stroke-width: 1px;
   stroke: #808080;
-  margin-bottom: 24px;
 }
 
 .input-state:hover {
