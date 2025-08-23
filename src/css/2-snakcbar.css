@@ -74,4 +74,6 @@
   width: 360px;
   height: 40px;
   background: #4e75ff;
+  cursor: pointer;
+  border: none;
 }
