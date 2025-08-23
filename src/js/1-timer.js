@@ -1,23 +1,18 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-const datetimePicker = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('[data-start]');
 const daysEl = document.querySelector('[data-days]');
 const hoursEl = document.querySelector('[data-hours]');
 const minutesEl = document.querySelector('[data-minutes]');
 const secondsEl = document.querySelector('[data-seconds]');
 
-let userSelectedDate = null;
+let selectedDate = null;
 let timerId = null;
 
-// Кнопка спочатку неактивна
-startBtn.disabled = true;
-
-const options = {
+flatpickr('#datetime-picker', {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
@@ -25,50 +20,40 @@ const options = {
   onClose(selectedDates) {
     if (selectedDates[0] <= new Date()) {
       iziToast.error({
-        title: 'Error',
-        message: 'Please choose a date in the future',
+        title: 'Помилка',
+        message: 'Будь ласка, оберіть дату у майбутньому!',
         position: 'topRight',
       });
       startBtn.disabled = true;
     } else {
-      userSelectedDate = selectedDates[0];
       startBtn.disabled = false;
+      selectedDate = selectedDates[0];
     }
   },
-};
-
-flatpickr(datetimePicker, options);
+});
 
 startBtn.addEventListener('click', () => {
+  if (!selectedDate) return;
   startBtn.disabled = true;
-  datetimePicker.disabled = true;
 
   timerId = setInterval(() => {
-    const diff = userSelectedDate - new Date();
+    const diff = selectedDate - new Date();
 
     if (diff <= 0) {
       clearInterval(timerId);
-      updateTimer(0);
-      datetimePicker.disabled = false;
+      updateTimer(0, 0, 0, 0);
+      iziToast.info({
+        title: 'Готово',
+        message: 'Час вийшов!',
+        position: 'topRight',
+      });
       return;
     }
 
-    updateTimer(diff);
+    const { days, hours, minutes, seconds } = convertMs(diff);
+    updateTimer(days, hours, minutes, seconds);
   }, 1000);
 });
-
-function updateTimer(ms) {
-  const { days, hours, minutes, seconds } = convertMs(ms);
-
-  daysEl.textContent = addLeadingZero(days);
-  hoursEl.textContent = addLeadingZero(hours);
-  minutesEl.textContent = addLeadingZero(minutes);
-  secondsEl.textContent = addLeadingZero(seconds);
-}
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
-}
 
 function convertMs(ms) {
   const second = 1000;
@@ -82,4 +67,11 @@ function convertMs(ms) {
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
+}
+
+function updateTimer(days, hours, minutes, seconds) {
+  daysEl.textContent = String(days).padStart(2, '0');
+  hoursEl.textContent = String(hours).padStart(2, '0');
+  minutesEl.textContent = String(minutes).padStart(2, '0');
+  secondsEl.textContent = String(seconds).padStart(2, '0');
 }
