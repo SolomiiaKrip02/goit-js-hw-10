@@ -1,11 +1,11 @@
-import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr/dist/esm/index.js';
-import 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
-import iziToast from 'https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js';
-import 'https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
+const datetimePicker = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('[data-start]');
-const dateInput = document.querySelector('#datetime-picker');
 const daysEl = document.querySelector('[data-days]');
 const hoursEl = document.querySelector('[data-hours]');
 const minutesEl = document.querySelector('[data-minutes]');
@@ -14,6 +14,7 @@ const secondsEl = document.querySelector('[data-seconds]');
 let userSelectedDate = null;
 let timerId = null;
 
+// Кнопка спочатку неактивна
 startBtn.disabled = true;
 
 const options = {
@@ -22,8 +23,7 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const pickedDate = selectedDates[0];
-    if (pickedDate <= new Date()) {
+    if (selectedDates[0] <= new Date()) {
       iziToast.error({
         title: 'Error',
         message: 'Please choose a date in the future',
@@ -31,34 +31,36 @@ const options = {
       });
       startBtn.disabled = true;
     } else {
-      userSelectedDate = pickedDate;
+      userSelectedDate = selectedDates[0];
       startBtn.disabled = false;
     }
   },
 };
 
-flatpickr(dateInput, options);
+flatpickr(datetimePicker, options);
 
 startBtn.addEventListener('click', () => {
   startBtn.disabled = true;
-  dateInput.disabled = true;
+  datetimePicker.disabled = true;
 
   timerId = setInterval(() => {
     const diff = userSelectedDate - new Date();
 
     if (diff <= 0) {
       clearInterval(timerId);
-      updateTimerUI({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      dateInput.disabled = false;
+      updateTimer(0);
+      datetimePicker.disabled = false;
       return;
     }
 
-    updateTimerUI(convertMs(diff));
+    updateTimer(diff);
   }, 1000);
 });
 
-function updateTimerUI({ days, hours, minutes, seconds }) {
-  daysEl.textContent = days;
+function updateTimer(ms) {
+  const { days, hours, minutes, seconds } = convertMs(ms);
+
+  daysEl.textContent = addLeadingZero(days);
   hoursEl.textContent = addLeadingZero(hours);
   minutesEl.textContent = addLeadingZero(minutes);
   secondsEl.textContent = addLeadingZero(seconds);
