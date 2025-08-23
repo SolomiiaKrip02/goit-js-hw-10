@@ -51,6 +51,7 @@
   border-radius: 4px;
   stroke-width: 1px;
   stroke: #808080;
+  margin-bottom: 24px;
 }
 
 .input-state:hover {
